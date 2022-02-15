@@ -1,0 +1,39 @@
+//@version=5
+indicator(title="Golden Alligator", shorttitle="Alligator", overlay=true, timeframe="", timeframe_gaps=true)
+smma(src, length) =>
+	smma =  0.0
+	smma := na(smma[1]) ? ta.sma(src, length) : (smma[1] * (length - 1) + src) / length
+	smma
+jawLength = input.int(13, minval=1, title="Jaw Length")
+teethLength = input.int(8, minval=1, title="Teeth Length")
+lipsLength = input.int(5, minval=1, title="Lips Length")
+jawOffset = input(8, title="Jaw Offset")
+teethOffset = input(5, title="Teeth Offset")
+lipsOffset = input(3, title="Lips Offset")
+jaw = smma(hl2, jawLength)
+teeth = smma(hl2, teethLength)
+lips = smma(hl2, lipsLength)
+
+clrBull = color.new(color(#DBD07C), 0)
+clrBullFill = color.new(color(#FBF956), 50)
+clrBear = color.new(color(#9892D7), 0)
+clrBearFill = color.new(color(#2567C5), 50)
+clrNeutral = color.new(color(#B3AFA8), 0)
+clrNeutralFill = color.new(color(#C4C1C2), 70)
+clrMiddle = color.new(color(#C4C1C2), 100)
+
+neutralMax = 0.025
+bull  = jaw < lips
+delta = bull != true ? 1- (lips / jaw ) : 1- (jaw / lips )
+neutral = delta < neutralMax
+
+bullOrBearColor = bull ? clrBullFill : clrBearFill
+bullOrBearLineColor = bull ? clrBull : clrBear
+lineColor = neutral ? clrNeutral : bullOrBearLineColor
+jawPlot = plot(jaw, "Jaw", offset = jawOffset, color= bullOrBearLineColor)
+teethPlot = plot(teeth, "Teeth", offset = teethOffset, color= clrMiddle)
+lipsPlot = plot(lips, "Lips", offset = lipsOffset, color=bullOrBearLineColor)
+fillColor = neutral ? clrNeutralFill : bullOrBearColor
+fill(jawPlot, lipsPlot, color = fillColor)
+fill(jawPlot, teethPlot, color = fillColor)
+fill(lipsPlot, teethPlot, color = fillColor)

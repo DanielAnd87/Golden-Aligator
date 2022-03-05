@@ -4,15 +4,17 @@ smma(src, length) =>
 	smma =  0.0
 	smma := na(smma[1]) ? ta.sma(src, length) : (smma[1] * (length - 1) + src) / length
 	smma
-jawLength = input.int(13, minval=1, title="Jaw Length")
+jawLength = input.int(11, minval=1, title="Jaw Length")
 teethLength = input.int(8, minval=1, title="Teeth Length")
 lipsLength = input.int(5, minval=1, title="Lips Length")
-jawOffset = input(8, title="Jaw Offset")
-teethOffset = input(5, title="Teeth Offset")
-lipsOffset = input(3, title="Lips Offset")
-jaw = smma(hl2, jawLength)
-teeth = smma(hl2, teethLength)
-lips = smma(hl2, lipsLength)
+jawOffset = input(6, title="Jaw Offset")
+teethOffset = input(6, title="Teeth Offset")
+lipsOffset = input(2, title="Lips Offset")
+smoothingNum = 2
+
+jaw = smma(hl2, jawLength*smoothingNum)
+teeth = smma(hl2, teethLength*smoothingNum)
+lips = smma(hl2, lipsLength*smoothingNum)
 
 clrBull = color.new(color(#DBD07C), 0)
 clrBullFill = color.new(color(#FBF956), 50)
@@ -22,7 +24,7 @@ clrNeutral = color.new(color(#B3AFA8), 0)
 clrNeutralFill = color.new(color(#C4C1C2), 70)
 clrMiddle = color.new(color(#C4C1C2), 100)
 
-neutralMax = 0.025
+neutralMax = 0.010
 bull  = jaw < lips
 delta = bull != true ? 1- (lips / jaw ) : 1- (jaw / lips )
 neutral = delta < neutralMax
